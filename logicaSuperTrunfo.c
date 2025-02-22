@@ -13,52 +13,61 @@ struct Carta
 };
 
 // Declaração dos métodos utilizados:
-struct Carta cadastrarCarta(); // Método para cadastrar uma carta.
-struct Carta randomCarta(); // Método para gerar uma carta aleatoriamente.
-char* randomNomeCidade(); // Método utilizado pelo randomCarta, retorna um nome de cidade aleatório.
-void exibirCarta(struct Carta carta); // Metodo para exibir uma carta. (não utilizado neste desafio mas deixei para fins de aprendizado ou uso no próximo desafio.)
-void cls(); // Método para limpar a tela do terminal utilizando um comando ANSI (foi o que funcionou melhor)
-char comparaValor(int valorA, int valorB); // Metodo para comparar dois valores, usado para comparar os valores das cartas e retornar uma string com o resultado da comparação '<', '>' ou '='.
+struct Carta cadastrarCarta();                                   // Método para cadastrar uma carta.
+struct Carta randomCarta();                                      // Método para gerar uma carta aleatoriamente.
+char *randomNomeCidade();                                        // Método utilizado pelo randomCarta, retorna um nome de cidade aleatório.
+void exibirCarta(struct Carta carta);                            // Metodo para exibir uma carta. (não utilizado neste desafio mas deixei para fins de aprendizado ou uso no próximo desafio.)
+void cls();                                                      // Método para limpar a tela do terminal utilizando um comando ANSI (foi o que funcionou melhor)
+char comparaValor(int valorA, int valorB);                       // Metodo para comparar dois valores, usado para comparar os valores das cartas e retornar uma string com o resultado da comparação '<', '>' ou '='.
 void exibirComparacao(struct Carta cartaA, struct Carta cartaB); // Método para exibir uma comparação entre as duas cartas e exibir o resultado.
-int clean_scanf(const char *format, void *arg); // Método criado para evitar problemas de buffer no scanf.
-void clean_fgets(char *str, int size); // Método criado para evitar problemas de buffer no fgets.
+int clean_scanf(const char *format, void *arg);                  // Método criado para evitar problemas de buffer no scanf.
+void clean_fgets(char *str, int size);                           // Método criado para evitar problemas de buffer no fgets.
+int scanfIntValue(const char *prompt);                           // Método criado para permitir que o usuário digite apenas valores inteiros positivos.
 
-
-int main() {
+int main()
+{
     struct Carta cartaA, cartaB;
 
     srand(time(NULL));
     cls();
-    
-    int opcao = 0;
-    while(opcao != 1 && opcao != 2) {
+
+    int opcao = -1;
+    while (opcao != 1 && opcao != 2 && opcao != 0)
+    {
         cls();
         printf("Bem-vindo ao Super Trunfo - Cidades!\n\n");
         printf("Escolha uma das opções:\n");
         printf("1 - Cadastrar Cartas\n");
         printf("2 - Gerar Cartas Aleatóriamente (para fins de teste)\n");
+        printf("0 - Sair\n");
         printf("=> ");
         clean_scanf("%i", &opcao);
     }
-    if(opcao == 1) {        
+
+    switch (opcao)
+    {
+    case 1:
         cls();
         printf("Por favor, cadastre as cartas de cidades:\n\n");
-        
+
         printf("Cidade 1:\n\n");
         cartaA = cadastrarCarta();
         cls();
-    
+
         printf("Cidade 2:\n\n");
         cartaB = cadastrarCarta();
         cls();
-    }else if(opcao == 2) {
+        break;
+    case 2:
         cartaA = randomCarta();
         cartaB = randomCarta();
-    }    
+        break;
+    case 0:
+        return 0;
+    }
 
     cls();
-    exibirComparacao(cartaA, cartaB);    
-
+    exibirComparacao(cartaA, cartaB);
 
     printf("\n\n Pressione ENTER para encerrar o programa.\n");
     getchar();
@@ -66,42 +75,52 @@ int main() {
     return 0;
 }
 
-int clean_scanf(const char *format, void *arg) {  
+int clean_scanf(const char *format, void *arg)
+{
     int result = scanf(format, arg);
-    while (getchar() != '\n');
+    while (getchar() != '\n')
+        ;
     return result;
 }
 
-void clean_fgets(char *str, int size) {
+void clean_fgets(char *str, int size)
+{
     fgets(str, size, stdin);
     str[strcspn(str, "\n")] = 0;
 }
 
-void cls() {
+void cls()
+{
     printf("\033[H\033[J");
 }
 
-char comparaValor(int valorA, int valorB) {
-    if (valorA > valorB) {
+char comparaValor(int valorA, int valorB)
+{
+    if (valorA > valorB)
+    {
         return '>';
-    } else if (valorA < valorB) {
+    }
+    else if (valorA < valorB)
+    {
         return '<';
-    } else {
+    }
+    else
+    {
         return '=';
     }
 }
 
-char* randomNomeCidade() {
+char *randomNomeCidade()
+{
     static char nomes[10][50] = {
         "Sao Paulo", "Rio de Janeiro", "Belo Horizonte", "Salvador", "Curitiba",
-        "Fortaleza", "Manaus", "Brasilia", "Vitoria", "Goiania"
-    };
+        "Fortaleza", "Manaus", "Brasilia", "Vitoria", "Goiania"};
     int index = rand() % 10;
     return nomes[index];
 }
 
-
-struct Carta randomCarta() {
+struct Carta randomCarta()
+{
     struct Carta carta;
     strcpy(carta.nome, randomNomeCidade());
     carta.populacao = rand() % 100;
@@ -111,28 +130,60 @@ struct Carta randomCarta() {
     return carta;
 }
 
-struct Carta cadastrarCarta() {
+struct Carta cadastrarCarta()
+{
     struct Carta novaCarta;
-    printf("# Cadastro de Cidades #\n");
-    printf("-----------------------\n");
-    printf("Qual o nome da cidade?\n=> ");
-    clean_fgets(novaCarta.nome, sizeof(novaCarta.nome));
+    
+    do
+    {
+        cls();
+        printf("# Cadastro de Cidades #\n");
+        printf("-----------------------\n");
+        printf("Qual o nome da cidade?\n=> ");
+        clean_fgets(novaCarta.nome, sizeof(novaCarta.nome));
+        if (strlen(novaCarta.nome) == 0 || strlen(novaCarta.nome) > 50)
+        {
+            printf("Entrada inválida. Digite um nome de cidade. O nome deve ter entre 1 e 50 caracteres.\n");
+            printf("Pressione Enter para continuar...");
+            getchar();
+        }
+        else
+        {
+            break;
+        }
+    } while (1);
 
-    printf("Qual a populacao da cidade?\n=> ");
-    clean_scanf("%i", &novaCarta.populacao);
+    novaCarta.populacao = scanfIntValue("Qual a populacao da cidade?\n=> ");
+    novaCarta.area = scanfIntValue("Qual a área da cidade?\n=> ");
+    novaCarta.pib = scanfIntValue("Qual o PIB da cidade?\n=> ");
+    novaCarta.pontosTuristicos = scanfIntValue("Qual a quantidade de pontos turísticos da cidade?\n=> ");
 
-    printf("Qual a área da cidade?\n=> ");
-    clean_scanf("%i", &novaCarta.area);
-
-    printf("Qual o PIB da cidade?\n=> ");
-    clean_scanf("%i", &novaCarta.pib);
-
-    printf("Qual a quantidade de pontos turísticos da cidade?\n=> ");
-    clean_scanf("%i", &novaCarta.pontosTuristicos);
     return novaCarta;
 }
 
-void exibirCarta(struct Carta carta) {
+int scanfIntValue(const char *prompt)
+{
+    int value;
+    do
+    {
+        cls();
+        printf("%s", prompt);
+        if (clean_scanf("%d", &value) != 1 || value <= 0)
+        {
+            printf("Entrada inválida. Digite um número inteiro positivo.\n");
+            printf("Pressione Enter para continuar...");
+            getchar();
+        }
+        else
+        {
+            break;
+        }
+    } while (1);
+    return value;
+}
+
+void exibirCarta(struct Carta carta)
+{
     printf("###################################\n");
     printf("#         CARTA DE CIDADE         #\n");
     printf("###################################\n");
@@ -144,7 +195,8 @@ void exibirCarta(struct Carta carta) {
     printf("###################################\n");
 }
 
-void exibirComparacao(struct Carta cartaA, struct Carta cartaB) {
+void exibirComparacao(struct Carta cartaA, struct Carta cartaB)
+{
     char resultado[2] = "";
     int pontosA = 0, pontosB = 0;
 
@@ -160,36 +212,47 @@ void exibirComparacao(struct Carta cartaA, struct Carta cartaB) {
     printf("-------------------------------------------------\n");
     resultado[0] = comparaValor(cartaA.populacao, cartaB.populacao);
     resultado[1] = '\0';
-    if( resultado[0] == '>' ) pontosA++;
-    if( resultado[0] == '<' ) pontosB++;
+    if (resultado[0] == '>')
+        pontosA++;
+    if (resultado[0] == '<')
+        pontosB++;
     printf("População: --------- %i %s %i\n", cartaA.populacao, resultado, cartaB.populacao);
 
     resultado[0] = comparaValor(cartaA.area, cartaB.area);
     resultado[1] = '\0';
-    if( resultado[0] == '>' ) pontosA++;
-    if( resultado[0] == '<' ) pontosB++;
+    if (resultado[0] == '>')
+        pontosA++;
+    if (resultado[0] == '<')
+        pontosB++;
     printf("Área: -------------- %i %s %i\n", cartaA.area, resultado, cartaB.area);
 
     resultado[0] = comparaValor(cartaA.pib, cartaB.pib);
     resultado[1] = '\0';
-    if( resultado[0] == '>' ) pontosA++;
-    if( resultado[0] == '<' ) pontosB++;
+    if (resultado[0] == '>')
+        pontosA++;
+    if (resultado[0] == '<')
+        pontosB++;
     printf("PIB: --------------- %i %s %i\n", cartaA.pib, resultado, cartaB.pib);
 
     resultado[0] = comparaValor(cartaA.pontosTuristicos, cartaB.pontosTuristicos);
     resultado[1] = '\0';
-    if( resultado[0] == '>' ) pontosA++;
-    if( resultado[0] == '<' ) pontosB++;
+    if (resultado[0] == '>')
+        pontosA++;
+    if (resultado[0] == '<')
+        pontosB++;
     printf("Pontos Turísticos: - %i %s %i\n", cartaA.pontosTuristicos, resultado, cartaB.pontosTuristicos);
     printf("#################################################\n\n");
 
-    if( pontosA > pontosB ) {
+    if (pontosA > pontosB)
+    {
         printf("A cidade vencedora é: %s\n com %i pontos\n", cartaA.nome, pontosA);
-    } 
-    if( pontosA < pontosB ) {
+    }
+    if (pontosA < pontosB)
+    {
         printf("A cidade vencedora é: %s com %i pontos\n", cartaB.nome, pontosB);
     }
-    if( pontosA == pontosB ) {
+    if (pontosA == pontosB)
+    {
         printf("As duas cidades empataram com %i pontos.\n", pontosA);
     }
 }
